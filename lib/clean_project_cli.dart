@@ -9,7 +9,9 @@ void main(List<String> arguments) {
     print('No Git repositories found in the specified directory.');
   } else {
     for (final directoryPath in directoryPaths) {
-      final gitignoreContent = File('$directoryPath/.gitignore').readAsStringSync();
+      final ignoreFile = File('$directoryPath/.gitignore');
+      if (!ignoreFile.existsSync()) return;
+      final gitignoreContent = ignoreFile.readAsStringSync();
       final ignoredPaths = parseGitignore(gitignoreContent);
       for (var path in ignoredPaths) {
         deleteFromPath('$directoryPath/$path');
@@ -40,10 +42,7 @@ List<String> findGitDirectories(String directoryPath) {
 }
 
 List<String> parseGitignore(String content) {
-  return content
-      .split('\n')
-      .where((line) => line.isNotEmpty && !line.startsWith('#'))
-      .toList();
+  return content.split('\n').where((line) => line.isNotEmpty && !line.startsWith('#')).toList();
 }
 
 void deleteFromPath(String path) {
